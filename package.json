@@ -1,0 +1,11 @@
+{
+  "name": "chargers",
+  "version": "1.0.0",
+  "description": "Better ESB Electric Car Charging locations app",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC"
+}
