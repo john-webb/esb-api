@@ -3,6 +3,56 @@ var parseString = require('xml2js').parseString;
 var AWS = require('aws-sdk');
 var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
+var styleURLToType = {
+    StandardType2 : "Standard Type 2",
+    Own_StandardType2 : "Standard Type 2",
+    Own_StandardType2_Part : "Standard Type 2",
+    Own_StandardType2_OOS : "Standard Type 2",
+    Own_StandardType2_Occ : "Standard Type 2",
+    Own_StandardType2_right : "Standard Type 2",
+    Own_StandardType2_right_Occ : "Standard Type 2",
+    Other_StandardType2 : "Standard Type 2",
+    Other_StandardType2_OOS : "Standard Type 2",
+    Other_StandardType2_right : "Standard Type 2",
+    Other_StandardType2_Occ : "Standard Type 2",
+    Other_StandardType2_Part : "Standard Type 2",
+    Other_StandardType2_right_Occ : "Standard Type 2",
+    Other_Hotel : "Other",
+    Other_Services : "Other",
+    Own_FastAC43 : "Fast AC",
+    Own_FastAC43_Occ : "Fast AC",
+    Own_FastAC43_left : "Fast AC",
+    Own_FastAC43_OOS : "Fast AC",
+    Own_FastAC43_left_OOS : "Fast AC",
+    Own_FastAC43_left_Occ : "Fast AC",
+    Other_FastAC43_Occ : "Fast AC",
+    Other_FastAC43 : "Fast AC",
+    Other_FastAC43_left : "Fast AC",
+    Other_FastAC43_OOS : "Fast AC",
+    Own_ComboCCS : "Combo CCS",
+    Own_ComboCCS_OOS : "Combo CCS",
+    Own_ComboCCS_Occ : "Combo CCS",
+    Own_ComboCCS_left : "Combo CCS",
+    Own_ComboCCS_left_Occ : "Combo CCS",
+    Own_ComboCCS_left_Occ : "Combo CCS",
+    Other_ComboCCS : "Combo CCS",
+    Other_ComboCCS_OOS : "Combo CCS",
+    Other_ComboCCS_Occ : "Combo CCS",
+    Other_ComboCCS_left_Occ : "Combo CCS",
+    Other_CHAdeMO : "Chademo",
+    Other_CHAdeMO_left : "Chademo",
+    Other_CHAdeMO_left_Occ : "Chademo",
+    Other_CHAdeMO_Occ : "Chademo",
+    Other_CHAdeMO_left_OOS : "Chademo",
+    Own_CHAdeMO : "Chademo",
+    Own_CHAdeMO_left : "Chademo",
+    Own_CHAdeMO_Occ : "Chademo",
+    Own_CHAdeMO_OOS : "Chademo",
+    Own_CHAdeMO_OOS : "Chademo",
+    Own_CHAdeMO_left_Occ : "Chademo",
+    Own_CHAdeMO_left_OOS : "Chademo"
+}
+
 exports.handler = function(event, context, callback) {
     console.log(event.url); // Print the error if one occurred
     request(event.url, function (error, response, body) {
@@ -51,8 +101,13 @@ function addItem(item){
 
 function parseItem(item){
     var coordsArray = item.Point[0].coordinates[0].split(",");
+    var type = styleURLToType[item.styleUrl[0].substr(1)];
+    if(!styleURLToType.hasOwnProperty(item.styleUrl[0].substr(1))){
+        console.log(item.styleUrl[0].substr(1));
+    }
     return {
         name: {S: item.name[0]},
+        type: {S: type},
         coordinates : { M : {
             lng: {N: coordsArray[0]},
             lat: {N: coordsArray[1]}
