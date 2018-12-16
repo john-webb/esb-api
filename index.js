@@ -84,21 +84,6 @@ function buildPutRequests(result){
     return items;
 }
 
-function addItem(item){
-    var tableName = "chargers";
-    dynamodb.putItem({
-        "TableName": tableName,
-        "Item" : item
-    }, function(error, data) {
-        if (error) {
-            console.log('Error putting item into dynamodb failed: '+error);
-        }
-        else {
-            console.log('great success: '+JSON.stringify(data, null, '  '));
-        }
-    });
-}
-
 function parseItem(item){
     var coordsArray = item.Point[0].coordinates[0].split(",");
     var type = styleURLToType[item.styleUrl[0].substr(1)];
