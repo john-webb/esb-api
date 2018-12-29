@@ -44,6 +44,7 @@ var styleURLToType = {
     Other_CHAdeMO_left_Occ : "Chademo",
     Other_CHAdeMO_Occ : "Chademo",
     Other_CHAdeMO_left_OOS : "Chademo",
+    Other_CHAdeMO_OOS : "Chademo",
     Own_CHAdeMO : "Chademo",
     Own_CHAdeMO_left : "Chademo",
     Own_CHAdeMO_Occ : "Chademo",
@@ -90,14 +91,28 @@ function parseItem(item){
     if(!styleURLToType.hasOwnProperty(item.styleUrl[0].substr(1))){
         console.log(item.styleUrl[0].substr(1));
     }
+
     return {
         name: {S: item.name[0]},
         type: {S: type},
+        chargers : { L : parseDescription(item.description[0])},
         coordinates : { M : {
             lng: {N: coordsArray[0]},
             lat: {N: coordsArray[1]}
         }}
     }
+}
+
+function parseDescription(description){
+    var chargers = description.match(/(Combo DC 50kW|Fast AC \(Type-2\) (.*)KW|CHAdeMO DC (.*)kW|Type-2 AC Socket (.*)kW) \((.*?)\)/gm);
+    if(!chargers){
+        console.log(description);
+        return [];
+    }
+    var formattedChargers = chargers.map(function(value){
+        return {S : value};
+    });
+    return formattedChargers;
 }
 
 function saveItems(items) {
@@ -114,8 +129,13 @@ function saveItems(items) {
         };
         dynamodb.batchWriteItem(params, function(err, data) {
             console.log("Response from DynamoDB");
-            if(err) console.log(err);
-            else    console.log(data);
+            if(err) {
+                console.log(err);
+                console.log(JSON.stringify(params));
+            }
+            else{
+                console.log(data);
+            }
         });
     }
 }
