@@ -1,7 +1,10 @@
 var request = require('request');
 var parseString = require('xml2js').parseString;
 var AWS = require('aws-sdk');
+AWS.config.update({region: 'eu-west-1'});
+
 var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
 
 var styleURLToType = {
     StandardType2 : "Standard Type 2",
@@ -140,7 +143,16 @@ function saveItems(items) {
     }
 }
 
-//
-// exports.handler({
-//     "url": "http://www.esb.ie/ECARS/kml/charging-locations.kml"
-// });
+exports.scan = function(event, context, callback){
+    console.log("Scanning Chargers table.");
+    var params = {
+        TableName: "chargers"
+    };
+    docClient.scan(params, function(err, data){
+        if(err){
+            callback(err, null);
+        }else{
+            callback(null, data.Items);
+        }
+    });
+}
